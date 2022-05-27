@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -15,6 +16,14 @@ import (
 )
 
 func Run() {
+
+	mariadb, err := ConnectToMariaDB()
+	if err != nil {
+		log.Fatal("database connection error: ", err)
+	}
+
+	fmt.Println("Mariadb connected", mariadb)
+
 	app := fiber.New(fiber.Config{
 		AppName:      "golangAPI",
 		ServerHeader: "FiberServer",

@@ -1,19 +1,14 @@
 package infrastructure
 
 import (
-	"database/sql"
-	"time"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-func ConnectToMariaDB() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:@tcp(mariadb:3306)/fiber_golangapi")
+func ConnectToMariaDB() (*gorm.DB, error) {
+	db, err := gorm.Open(mysql.Open("root:root@tcp(mariadb:3306)/golang_api_database"), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
-	// Set up important parts as was told by the documentation.
-	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
-
 	return db, nil
 }
