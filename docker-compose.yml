@@ -1,0 +1,41 @@
+version: "3.9"
+services:
+  fiber-application:
+    restart: always
+    image: golang_api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    ports:
+      - 3333:3333
+    environment:
+      - API_USERID=1
+      - API_USERNAME=fiber
+      - API_PASSWORD=fiber
+      - JWT_SECRET=fiber
+    networks:
+      - application
+    depends_on:
+      - mariadb
+    command: ./golang_api
+
+  mariadb:
+    image: mariadb:10.8
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ./scripts/migrations.sql:/docker-entrypoint-initdb.d/1.sql
+    expose:
+      - 3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=golang_password
+      - MYSQL_USER=golang
+      - MYSQL_DATABASE=golang_api_database
+    networks:
+      - application
+
+networks:
+  application:
