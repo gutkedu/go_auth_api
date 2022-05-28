@@ -29,7 +29,6 @@ func Run() {
 		ServerHeader: "FiberServer",
 	})
 
-	//Use global middlewares
 	app.Use(cors.New())
 	app.Use(compress.New())
 	app.Use(etag.New())
@@ -47,6 +46,7 @@ func Run() {
 	app.Use(recover.New())
 	app.Use(requestid.New())
 
-	//Listen to port 3333
+	RegisterRoutes(app)
+
 	log.Fatal(app.Listen(":3333"))
 }
