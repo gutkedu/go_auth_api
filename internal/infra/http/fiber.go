@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,19 +13,20 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gutkedu/golang_api/internal/infra/gorm"
+	"github.com/gutkedu/golang_api/internal/infra/gorm/migrations"
 	"github.com/gutkedu/golang_api/internal/infra/http/routes"
-	"github.com/gutkedu/golang_api/internal/modules/user"
-	"github.com/gutkedu/golang_api/internal/modules/user/infra/gorm/entities"
 )
 
 func Run() {
 
+	//Database
 	pgdb, err := gorm.ConnectToPgDB()
 	if err != nil {
 		log.Fatal("database connection error: ", err)
 	}
 
-	pgdb.AutoMigrate(&entities.User{})
+	//Migrations
+	migrations.RunGormMigrations(pgdb)
 
 	app := fiber.New(fiber.Config{
 		AppName:      "golangAPI",
@@ -50,23 +50,8 @@ func Run() {
 	app.Use(recover.New())
 	app.Use(requestid.New())
 
-	// Create repositories.
-	userRepository := user.NewUserRepository(pgdb)
-
-	// Create all of our services.
-	userUseCase := user.NewUserUseCase(userRepository)
-
-	// Prepare our endpoints for the API.
-	routes.NewUserController(app.Group("/api/v1/users"), userUseCase)
-
-	// Prepare an endpoint for 'Not Found'.
-	app.All("*", func(c *fiber.Ctx) error {
-		errorMessage := fmt.Sprintf("Route '%s' does not exist in this API!", c.OriginalURL())
-		return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
-			"status":  "fail",
-			"message": errorMessage,
-		})
-	})
+	//Router
+	routes.RegisterRoutes(app, pgdb)
 
 	log.Fatal(app.Listen(":3333"))
 }
