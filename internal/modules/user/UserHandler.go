@@ -5,15 +5,16 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/gutkedu/golang_api/internal/modules/user/infra/gorm/entities"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // Represents our handler with our use-case / service.
 type UserHandler struct {
-	userService UserService
+	userService entities.UserService
 }
 
-func NewUserHandler(userRoute fiber.Router, us UserService) {
+func NewUserHandler(userRoute fiber.Router, us entities.UserService) {
 	handler := &UserHandler{
 		userService: us,
 	}
@@ -82,7 +83,7 @@ func (h *UserHandler) getUser(c *fiber.Ctx) error {
 }
 
 func (h *UserHandler) createUser(c *fiber.Ctx) error {
-	user := &User{}
+	user := &entities.User{}
 
 	// Create cancellable context.
 	customContext, cancel := context.WithCancel(context.Background())
@@ -120,7 +121,7 @@ func (h *UserHandler) createUser(c *fiber.Ctx) error {
 
 func (h *UserHandler) updateUser(c *fiber.Ctx) error {
 	// Initialize variables.
-	user := &User{}
+	user := &entities.User{}
 	targetedUserID := c.Locals("userID").(uuid.UUID)
 
 	// Create cancellable context.

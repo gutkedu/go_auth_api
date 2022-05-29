@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/gutkedu/golang_api/internal/infrastructure"
+	"github.com/gutkedu/golang_api/internal/infra/http"
 )
 
 func main() {
-	infrastructure.Run()
+	http.Run()
 }

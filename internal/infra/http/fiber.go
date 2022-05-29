@@ -1,4 +1,4 @@
-package infrastructure
+package http
 
 import (
 	"fmt"
@@ -13,17 +13,20 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
-	"github.com/gutkedu/golang_api/internal/user"
+	"github.com/gutkedu/golang_api/internal/infra/gorm"
+	"github.com/gutkedu/golang_api/internal/modules/user"
+	"github.com/gutkedu/golang_api/internal/modules/user/infra/gorm/entities"
+	"github.com/gutkedu/golang_api/internal/modules/user/infra/gorm/repositories"
 )
 
 func Run() {
 
-	pgdb, err := ConnectToPgDB()
+	pgdb, err := gorm.ConnectToPgDB()
 	if err != nil {
 		log.Fatal("database connection error: ", err)
 	}
 
-	pgdb.AutoMigrate(&user.User{})
+	pgdb.AutoMigrate(&entities.User{})
 
 	app := fiber.New(fiber.Config{
 		AppName:      "golangAPI",
@@ -47,13 +50,11 @@ func Run() {
 	app.Use(recover.New())
 	app.Use(requestid.New())
 
-	RegisterRoutes(app)
-
 	// Create repositories.
-	userRepository := user.NewUserRepository(pgdb)
+	userRepository := repositories.NewUserRepository(pgdb)
 
 	// Create all of our services.
-	userService := user.NewUserService(userRepository)
+	userService := user.NewUserUseCase(userRepository)
 
 	// Prepare our endpoints for the API.
 	user.NewUserHandler(app.Group("/api/v1/users"), userService)

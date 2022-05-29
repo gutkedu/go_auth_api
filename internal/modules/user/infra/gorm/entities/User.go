@@ -1,4 +1,4 @@
-package user
+package entities
 
 import (
 	"context"
@@ -9,10 +9,10 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();" json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Password  string
+	ID        uuid.UUID `gorm:"type:uuid;" json:"id"`
+	Name      string    `gorm:"type:string" json:"name"`
+	Email     string    `gorm:"type:string" json:"email"`
+	Password  string    `gorm:"type:string" json:"-"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
