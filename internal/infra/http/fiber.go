@@ -14,9 +14,9 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gutkedu/golang_api/internal/infra/gorm"
+	"github.com/gutkedu/golang_api/internal/infra/http/routes"
 	"github.com/gutkedu/golang_api/internal/modules/user"
 	"github.com/gutkedu/golang_api/internal/modules/user/infra/gorm/entities"
-	"github.com/gutkedu/golang_api/internal/modules/user/infra/gorm/repositories"
 )
 
 func Run() {
@@ -51,13 +51,13 @@ func Run() {
 	app.Use(requestid.New())
 
 	// Create repositories.
-	userRepository := repositories.NewUserRepository(pgdb)
+	userRepository := user.NewUserRepository(pgdb)
 
 	// Create all of our services.
-	userService := user.NewUserUseCase(userRepository)
+	userUseCase := user.NewUserUseCase(userRepository)
 
 	// Prepare our endpoints for the API.
-	user.NewUserHandler(app.Group("/api/v1/users"), userService)
+	routes.NewUserController(app.Group("/api/v1/users"), userUseCase)
 
 	// Prepare an endpoint for 'Not Found'.
 	app.All("*", func(c *fiber.Ctx) error {

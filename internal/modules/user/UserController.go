@@ -5,39 +5,20 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/gutkedu/golang_api/internal/modules/user/infra/gorm/entities"
-	"golang.org/x/crypto/bcrypt"
 )
 
-// Represents our handler with our use-case / service.
-type UserHandler struct {
-	userService entities.UserService
+// Represents our controller with our use-case / service.
+type UserController struct {
+	UserUseCase UserUseCase
 }
 
-func NewUserHandler(userRoute fiber.Router, us entities.UserService) {
-	handler := &UserHandler{
-		userService: us,
-	}
-	userRoute.Get("", handler.getUsers)
-	userRoute.Post("", handler.createUser)
-
-	userRoute.Get("/:userID", handler.getUser)
-	userRoute.Put("/:userID", handler.checkIfUserExistsMiddleware, handler.updateUser)
-	userRoute.Delete("/:userID", handler.checkIfUserExistsMiddleware, handler.deleteUser)
-}
-
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
-}
-
-func (h *UserHandler) getUsers(c *fiber.Ctx) error {
+func (h *UserController) GetUsersController(c *fiber.Ctx) error {
 	// Create cancellable context.
 	customContext, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	// Get all users.
-	users, err := h.userService.GetUsers(customContext)
+	users, err := h.UserUseCase.GetUsers(customContext)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 			"status":  "fail",
@@ -52,7 +33,7 @@ func (h *UserHandler) getUsers(c *fiber.Ctx) error {
 	})
 }
 
-func (h *UserHandler) getUser(c *fiber.Ctx) error {
+func (h *UserController) GetUserController(c *fiber.Ctx) error {
 	// Create cancellable context.
 	customContext, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -67,7 +48,7 @@ func (h *UserHandler) getUser(c *fiber.Ctx) error {
 	}
 
 	// Get one user.
-	user, err := h.userService.GetUser(customContext, targetedUserID)
+	user, err := h.UserUseCase.GetUser(customContext, targetedUserID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 			"status":  "fail",
@@ -82,8 +63,8 @@ func (h *UserHandler) getUser(c *fiber.Ctx) error {
 	})
 }
 
-func (h *UserHandler) createUser(c *fiber.Ctx) error {
-	user := &entities.User{}
+func (h *UserController) CreateUserController(c *fiber.Ctx) error {
+	user := &User{}
 
 	// Create cancellable context.
 	customContext, cancel := context.WithCancel(context.Background())
@@ -97,14 +78,8 @@ func (h *UserHandler) createUser(c *fiber.Ctx) error {
 		})
 	}
 
-	hash, err := hashPassword(user.Password)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't hash password", "data": err})
-	}
-	user.Password = hash
-
 	// Create one user.
-	err = h.userService.CreateUser(customContext, user)
+	err := h.UserUseCase.CreateUser(customContext, user)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 			"status":  "fail",
@@ -119,9 +94,9 @@ func (h *UserHandler) createUser(c *fiber.Ctx) error {
 	})
 }
 
-func (h *UserHandler) updateUser(c *fiber.Ctx) error {
+func (h *UserController) UpdateUserController(c *fiber.Ctx) error {
 	// Initialize variables.
-	user := &entities.User{}
+	user := &User{}
 	targetedUserID := c.Locals("userID").(uuid.UUID)
 
 	// Create cancellable context.
@@ -137,7 +112,7 @@ func (h *UserHandler) updateUser(c *fiber.Ctx) error {
 	}
 
 	// Update one user.
-	err := h.userService.UpdateUser(customContext, targetedUserID, user)
+	err := h.UserUseCase.UpdateUser(customContext, targetedUserID, user)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 			"status":  "fail",
@@ -152,7 +127,7 @@ func (h *UserHandler) updateUser(c *fiber.Ctx) error {
 	})
 }
 
-func (h *UserHandler) deleteUser(c *fiber.Ctx) error {
+func (h *UserController) DeleteUserController(c *fiber.Ctx) error {
 	// Initialize previous user ID.
 	targetedUserID := c.Locals("userID").(uuid.UUID)
 
@@ -161,7 +136,7 @@ func (h *UserHandler) deleteUser(c *fiber.Ctx) error {
 	defer cancel()
 
 	// Delete one user.
-	err := h.userService.DeleteUser(customContext, targetedUserID)
+	err := h.UserUseCase.DeleteUser(customContext, targetedUserID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 			"status":  "fail",

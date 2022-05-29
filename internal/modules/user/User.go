@@ -1,4 +1,4 @@
-package entities
+package user
 
 import (
 	"context"
@@ -33,7 +33,7 @@ type UserRepository interface {
 	DeleteUser(ctx context.Context, userID uuid.UUID) error
 }
 
-type UserService interface {
+type UserUseCase interface {
 	GetUsers(ctx context.Context) (*[]User, error)
 	GetUser(ctx context.Context, userID uuid.UUID) (*User, error)
 	CreateUser(ctx context.Context, user *User) error

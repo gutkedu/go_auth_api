@@ -8,7 +8,7 @@ import (
 )
 
 // If user does not exist, do not allow one to access the API.
-func (h *UserHandler) checkIfUserExistsMiddleware(c *fiber.Ctx) error {
+func (h *UserController) CheckIfUserExistsMiddleware(c *fiber.Ctx) error {
 	// Create a new customized context.
 	customContext, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -23,7 +23,7 @@ func (h *UserHandler) checkIfUserExistsMiddleware(c *fiber.Ctx) error {
 	}
 
 	// Check if user exists.
-	searchedUser, err := h.userService.GetUser(customContext, targetedUserID)
+	searchedUser, err := h.UserUseCase.GetUser(customContext, targetedUserID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 			"status":  "fail",

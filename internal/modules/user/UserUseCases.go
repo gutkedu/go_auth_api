@@ -5,40 +5,52 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/gutkedu/golang_api/internal/modules/user/infra/gorm/entities"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Implementation of the repository in this service.
-type userService struct {
-	userRepository entities.UserRepository
+type userUseCase struct {
+	userRepository UserRepository
+}
+
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
 }
 
 // Create a new 'service' or 'use-case' for 'User' entity.
-func NewUserUseCase(r entities.UserRepository) entities.UserService {
-	return &userService{
+func NewUserUseCase(r UserRepository) UserUseCase {
+	return &userUseCase{
 		userRepository: r,
 	}
 }
 
-func (s *userService) GetUsers(ctx context.Context) (*[]entities.User, error) {
+func (s *userUseCase) GetUsers(ctx context.Context) (*[]User, error) {
 	return s.userRepository.GetUsers(ctx)
 }
 
-func (s *userService) GetUser(ctx context.Context, userID uuid.UUID) (*entities.User, error) {
+func (s *userUseCase) GetUser(ctx context.Context, userID uuid.UUID) (*User, error) {
 	return s.userRepository.GetUser(ctx, userID)
 }
 
-func (s *userService) CreateUser(ctx context.Context, user *entities.User) error {
+func (s *userUseCase) CreateUser(ctx context.Context, user *User) error {
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
+
+	hash, err := hashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+	user.Password = hash
+
 	return s.userRepository.CreateUser(ctx, user)
 }
 
-func (s *userService) UpdateUser(ctx context.Context, userID uuid.UUID, user *entities.User) error {
+func (s *userUseCase) UpdateUser(ctx context.Context, userID uuid.UUID, user *User) error {
 	user.UpdatedAt = time.Now()
 	return s.userRepository.UpdateUser(ctx, userID, user)
 }
 
-func (s *userService) DeleteUser(ctx context.Context, userID uuid.UUID) error {
+func (s *userUseCase) DeleteUser(ctx context.Context, userID uuid.UUID) error {
 	return s.userRepository.DeleteUser(ctx, userID)
 }
