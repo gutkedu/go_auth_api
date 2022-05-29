@@ -1,5 +1,19 @@
 version: "3.9"
+
 services:
+  database:
+    image: postgres
+    container_name: database_golang
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=golangapi
+      - POSTGRES_PASSWORD=golang
+      - POSTGRES_DB=golang_database
+    volumes:
+      - pgdata:/data/postgres
+
   fiber-application:
     restart: always
     image: golang_api:latest
@@ -14,28 +28,12 @@ services:
       - API_USERNAME=fiber
       - API_PASSWORD=fiber
       - JWT_SECRET=fiber
-    networks:
-      - application
+    links:
+      - database
     depends_on:
-      - mariadb
+      - database
     command: ./golang_api
 
-  mariadb:
-    image: mariadb:10.8
-    restart: always
-    ports:
-      - 3306:3306
-    volumes:
-      - ./scripts/migrations.sql:/docker-entrypoint-initdb.d/1.sql
-    expose:
-      - 3306
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_PASSWORD=golang_password
-      - MYSQL_USER=golang
-      - MYSQL_DATABASE=golang_api_database
-    networks:
-      - application
-
-networks:
-  application:
+volumes:
+  pgdata:
+    driver: local

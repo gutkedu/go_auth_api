@@ -13,16 +13,17 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/gutkedu/golang_api/internal/user"
 )
 
 func Run() {
 
-	mariadb, err := ConnectToMariaDB()
+	pgdb, err := ConnectToPgDB()
 	if err != nil {
 		log.Fatal("database connection error: ", err)
 	}
 
-	fmt.Println("Mariadb connected", mariadb)
+	pgdb.AutoMigrate(&user.User{})
 
 	app := fiber.New(fiber.Config{
 		AppName:      "golangAPI",
@@ -47,6 +48,24 @@ func Run() {
 	app.Use(requestid.New())
 
 	RegisterRoutes(app)
+
+	// Create repositories.
+	userRepository := user.NewUserRepository(pgdb)
+
+	// Create all of our services.
+	userService := user.NewUserService(userRepository)
+
+	// Prepare our endpoints for the API.
+	user.NewUserHandler(app.Group("/api/v1/users"), userService)
+
+	// Prepare an endpoint for 'Not Found'.
+	app.All("*", func(c *fiber.Ctx) error {
+		errorMessage := fmt.Sprintf("Route '%s' does not exist in this API!", c.OriginalURL())
+		return c.Status(fiber.StatusNotFound).JSON(&fiber.Map{
+			"status":  "fail",
+			"message": errorMessage,
+		})
+	})
 
 	log.Fatal(app.Listen(":3333"))
 }

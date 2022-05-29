@@ -6,7 +6,8 @@ import (
 )
 
 func ConnectToMariaDB() (*gorm.DB, error) {
-	db, err := gorm.Open(mysql.Open("root:root@tcp(mariadb:3306)/golang_api_database"), &gorm.Config{})
+	dsn := "root:root@tcp(mariadb)/golang_database?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
