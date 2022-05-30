@@ -26,11 +26,11 @@ func NewUserUseCase(r UserRepository) UserUseCase {
 }
 
 func (s *userUseCase) GetUsers(ctx context.Context) (*[]User, error) {
-	return s.userRepository.GetUsers(ctx)
+	return s.userRepository.FindAll(ctx)
 }
 
 func (s *userUseCase) GetUser(ctx context.Context, userID uuid.UUID) (*User, error) {
-	return s.userRepository.GetUser(ctx, userID)
+	return s.userRepository.FindById(ctx, userID)
 }
 
 func (s *userUseCase) CreateUser(ctx context.Context, user *User) error {
@@ -43,14 +43,14 @@ func (s *userUseCase) CreateUser(ctx context.Context, user *User) error {
 	}
 	user.Password = hash
 
-	return s.userRepository.CreateUser(ctx, user)
+	return s.userRepository.Create(ctx, user)
 }
 
 func (s *userUseCase) UpdateUser(ctx context.Context, userID uuid.UUID, user *User) error {
 	user.UpdatedAt = time.Now()
-	return s.userRepository.UpdateUser(ctx, userID, user)
+	return s.userRepository.Update(ctx, userID, user)
 }
 
 func (s *userUseCase) DeleteUser(ctx context.Context, userID uuid.UUID) error {
-	return s.userRepository.DeleteUser(ctx, userID)
+	return s.userRepository.Delete(ctx, userID)
 }
