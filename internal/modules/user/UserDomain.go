@@ -11,7 +11,7 @@ import (
 type User struct {
 	ID        uuid.UUID `gorm:"type:uuid;" json:"id"`
 	Name      string    `gorm:"type:string;not null" json:"name"`
-	Email     string    `gorm:"type:string;unique_index;not null" json:"email"`
+	Email     string    `gorm:"type:string;uniqueIndex;not null" json:"email"`
 	Password  string    `gorm:"type:string;not null" json:"-"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -40,4 +40,5 @@ type UserUseCase interface {
 	CreateUser(ctx context.Context, user *User) error
 	UpdateUser(ctx context.Context, userID uuid.UUID, user *User) error
 	DeleteUser(ctx context.Context, userID uuid.UUID) error
+	GetUserByEmail(ctx context.Context, email string) (*User, error)
 }

@@ -147,3 +147,43 @@ func (h *UserController) DeleteUserController(c *fiber.Ctx) error {
 	// Return 204 No Content.
 	return c.SendStatus(fiber.StatusNoContent)
 }
+
+func (h *UserController) GetUserByEmailController(c *fiber.Ctx) error {
+	type Input struct {
+		Email string `json:"email"`
+	}
+	var input Input
+	// Create cancellable context.
+	customContext, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Parse request body.
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"status":  "fail body",
+			"message": err.Error(),
+		})
+	}
+
+	email := input.Email
+
+	user, err := h.UserUseCase.GetUserByEmail(customContext, email)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
+			"status":  "fail",
+			"message": err.Error(),
+		})
+	}
+
+	if user == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(
+			fiber.Map{"status": "error", "message": "User not found", "data": err})
+	}
+
+	// Return result.
+	return c.Status(200).JSON(&fiber.Map{
+		"status":  "success",
+		"message": "User has been created successfully!",
+		"data":    &user,
+	})
+}

@@ -33,6 +33,10 @@ func (s *userUseCase) GetUser(ctx context.Context, userID uuid.UUID) (*User, err
 	return s.userRepository.FindById(ctx, userID)
 }
 
+func (s *userUseCase) GetUserByEmail(ctx context.Context, email string) (*User, error) {
+	return s.userRepository.FindByEmail(ctx, email)
+}
+
 func (s *userUseCase) CreateUser(ctx context.Context, user *User) error {
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
