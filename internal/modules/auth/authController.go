@@ -1,24 +1,22 @@
 package auth
 
 import (
-	"time"
+	"context"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // Implementation of the repository in this service.
-type AuthController struct{}
-
-// CheckPasswordHash compare password with hash
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
+type AuthController struct {
+	AuthUserUseCase AuthUserUseCase
 }
 
 func (h *AuthController) GetNewAccessToken(c *fiber.Ctx) error {
 	var body AuthRequest
+
+	// Create cancellable context.
+	customContext, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "Error on login request", "data": err})
@@ -28,30 +26,16 @@ func (h *AuthController) GetNewAccessToken(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "Error on login request", "data": err})
 	}
 
-	if body.Email != "teste@teste.com" || body.Password != "123456" {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Bad Credentials",
+	res, err := h.AuthUserUseCase.Execute(customContext, body)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"status":  "fail",
+			"message": err.Error(),
 		})
 	}
 
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-	claims["sub"] = "1"
-	claims["exp"] = time.Now().Add(time.Hour * 24) // a day
-
-	s, err := token.SignedString([]byte("secret_test"))
-	if err != nil {
-		return c.SendStatus(fiber.StatusInternalServerError)
-	}
-
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"token": s,
-		"user": struct {
-			Id    int    `json:"id"`
-			Email string `json:"email"`
-		}{
-			Id:    1,
-			Email: "teste@teste.com",
-		},
+		"status": "success",
+		"data":   res,
 	})
 }

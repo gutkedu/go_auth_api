@@ -20,7 +20,7 @@ func NewUserRepository(dbConn *gorm.DB) UserRepository {
 func (r *DBRepository) FindAll(ctx context.Context) (*[]User, error) {
 	users := []User{}
 	if err := r.db.Find(&users).Error; err != nil {
-		return nil, err
+		return &[]User{}, err
 	}
 	return &users, nil
 }
@@ -28,7 +28,7 @@ func (r *DBRepository) FindAll(ctx context.Context) (*[]User, error) {
 func (r *DBRepository) FindById(ctx context.Context, userID uuid.UUID) (*User, error) {
 	user := User{ID: userID}
 	if err := r.db.First(&user).Error; err != nil {
-		return nil, err
+		return &User{}, err
 	}
 	return &user, nil
 }
@@ -36,7 +36,7 @@ func (r *DBRepository) FindById(ctx context.Context, userID uuid.UUID) (*User, e
 func (r *DBRepository) FindByEmail(ctx context.Context, userEmail string) (*User, error) {
 	var user User
 	if err := r.db.Where(&User{Email: userEmail}).Find(&user).Error; err != nil {
-		return nil, err
+		return &User{}, err
 	}
 	return &user, nil
 }

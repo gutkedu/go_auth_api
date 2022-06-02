@@ -6,8 +6,10 @@ import (
 )
 
 // Creates a new authentication handler.
-func NewAuthController(authRoute fiber.Router) {
-	controller := &auth.AuthController{}
+func NewAuthController(authRoute fiber.Router, au auth.AuthUserUseCase) {
+	controller := &auth.AuthController{
+		AuthUserUseCase: au,
+	}
 
 	// Declare routing for specific routes.
 	authRoute.Post("/login", controller.GetNewAccessToken)

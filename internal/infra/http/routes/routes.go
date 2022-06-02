@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gutkedu/golang_api/internal/modules/auth"
 	"github.com/gutkedu/golang_api/internal/modules/user"
 	"gorm.io/gorm"
 )
@@ -14,9 +15,10 @@ func RegisterRoutes(app *fiber.App, pgdb *gorm.DB) {
 
 	// Create all of our services.
 	userUseCase := user.NewUserUseCase(userRepository)
+	authUserUseCase := auth.NewAuthUserUseCase(userRepository)
 
 	// Prepare our endpoints for the API.
-	NewAuthController(app.Group("/api/v1/auth"))
+	NewAuthController(app.Group("/api/v1/auth"), authUserUseCase)
 	NewUserController(app.Group("/api/v1/users"), userUseCase)
 
 	// Prepare an endpoint for 'Not Found'.
