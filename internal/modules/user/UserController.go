@@ -78,6 +78,13 @@ func (h *UserController) CreateUserController(c *fiber.Ctx) error {
 		})
 	}
 
+	if err := user.CreateUserValidation(); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"status":  "fail",
+			"message": err.Error(),
+		})
+	}
+
 	// Create one user.
 	err := h.UserUseCase.CreateUser(customContext, user)
 	if err != nil {

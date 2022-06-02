@@ -10,3 +10,7 @@ stop:
 .PHONY: test
 test:
 	sh ./scripts/e2e-testing.sh
+
+.PHONY: dev
+dev:
+	go run cmd/golang_api/main.go

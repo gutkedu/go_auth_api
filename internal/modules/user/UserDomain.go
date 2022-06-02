@@ -4,12 +4,13 @@ import (
 	"context"
 	"time"
 
+	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	ID        uuid.UUID `gorm:"type:uuid;" json:"id"`
+	ID        uuid.UUID `gorm:"type:uuid" json:"id"`
 	Name      string    `gorm:"type:string;not null" json:"name"`
 	Email     string    `gorm:"type:string;uniqueIndex;not null" json:"email"`
 	Password  string    `gorm:"type:string;not null" json:"-"`
@@ -23,6 +24,14 @@ func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
 		return err
 	}
 	return
+}
+
+func (r User) CreateUserValidation() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Name, validation.Required),
+		validation.Field(&r.Email, validation.Required),
+		validation.Field(&r.Password, validation.Required),
+	)
 }
 
 type UserRepository interface {
