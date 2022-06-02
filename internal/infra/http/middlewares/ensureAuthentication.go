@@ -1,8 +1,6 @@
 package middlewares
 
 import (
-	"strconv"
-
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v2"
 	"github.com/golang-jwt/jwt"
@@ -27,7 +25,7 @@ func jwtError(c *fiber.Ctx, err error) error {
 func EnsureAuthentication() fiber.Handler {
 	return jwtware.New(jwtware.Config{
 		ErrorHandler:  jwtError,
-		SigningKey:    []byte("fiber"),
+		SigningKey:    []byte("Secret"),
 		SigningMethod: "HS256",
 	})
 }
@@ -37,15 +35,8 @@ func GetDataFromJWT(c *fiber.Ctx) error {
 	// Get userID from the previous route.
 	jwtData := c.Locals("user").(*jwt.Token)
 	claims := jwtData.Claims.(jwt.MapClaims)
-	parsedUserID := claims["uid"].(string)
-	userID, err := strconv.Atoi(parsedUserID)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
-			"status":  "fail",
-			"message": err.Error(),
-		})
-	}
+	parsedUserID := claims["user_id"].(string)
 	// Go to next.
-	c.Locals("currentUser", userID)
+	c.Locals("currentUser", parsedUserID)
 	return c.Next()
 }
