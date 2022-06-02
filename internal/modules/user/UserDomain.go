@@ -5,6 +5,7 @@ import (
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -29,7 +30,7 @@ func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
 func (r User) CreateUserValidation() error {
 	return validation.ValidateStruct(&r,
 		validation.Field(&r.Name, validation.Required),
-		validation.Field(&r.Email, validation.Required),
+		validation.Field(&r.Email, validation.Required, is.Email),
 		validation.Field(&r.Password, validation.Required),
 	)
 }

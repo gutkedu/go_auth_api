@@ -4,6 +4,7 @@ import (
 	"context"
 
 	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/gutkedu/golang_api/internal/modules/user"
 )
 
@@ -19,7 +20,7 @@ type AuthResponse struct {
 
 func (r AuthRequest) ValidateLoginInput() error {
 	return validation.ValidateStruct(&r,
-		validation.Field(&r.Email, validation.Required),
+		validation.Field(&r.Email, validation.Required, is.Email),
 		validation.Field(&r.Password, validation.Required),
 	)
 }
