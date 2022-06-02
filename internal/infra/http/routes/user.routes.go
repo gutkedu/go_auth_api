@@ -13,6 +13,10 @@ func NewUserController(userRoute fiber.Router, us user.UserUseCase) {
 	userRoute.Post("", controller.CreateUserController)
 	userRoute.Post("/email", controller.GetUserByEmailController)
 	userRoute.Get("/:userID", controller.GetUserController)
-	userRoute.Put("/:userID", controller.CheckIfUserExistsMiddleware, controller.UpdateUserController)
-	userRoute.Delete("/:userID", controller.CheckIfUserExistsMiddleware, controller.DeleteUserController)
+	userRoute.Put("/:userID",
+		controller.CheckIfUserExistsMiddleware,
+		controller.UpdateUserController)
+	userRoute.Delete("/:userID",
+		controller.CheckIfUserExistsMiddleware,
+		controller.DeleteUserController)
 }

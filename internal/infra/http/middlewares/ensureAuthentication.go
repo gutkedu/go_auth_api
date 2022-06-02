@@ -1,4 +1,4 @@
-package auth
+package middlewares
 
 import (
 	"strconv"
@@ -24,7 +24,7 @@ func jwtError(c *fiber.Ctx, err error) error {
 }
 
 // Guards a specific endpoint in the API.
-func (h *AuthController) JWTMiddleware() fiber.Handler {
+func EnsureAuthentication() fiber.Handler {
 	return jwtware.New(jwtware.Config{
 		ErrorHandler:  jwtError,
 		SigningKey:    []byte("fiber"),
@@ -32,8 +32,8 @@ func (h *AuthController) JWTMiddleware() fiber.Handler {
 	})
 }
 
-// Gets user data (their ID) from the JWT middleware. Should be executed after calling 'JWTMiddleware()'.
-func (h *AuthController) GetDataFromJWT(c *fiber.Ctx) error {
+// Gets user data (their ID) from the JWT middleware. Should be executed after calling 'EnsureAuthentication()'.
+func GetDataFromJWT(c *fiber.Ctx) error {
 	// Get userID from the previous route.
 	jwtData := c.Locals("user").(*jwt.Token)
 	claims := jwtData.Claims.(jwt.MapClaims)
@@ -45,7 +45,6 @@ func (h *AuthController) GetDataFromJWT(c *fiber.Ctx) error {
 			"message": err.Error(),
 		})
 	}
-
 	// Go to next.
 	c.Locals("currentUser", userID)
 	return c.Next()

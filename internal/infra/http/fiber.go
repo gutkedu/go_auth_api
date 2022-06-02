@@ -26,6 +26,7 @@ func Run() {
 		ServerHeader: "FiberServer",
 	})
 
+	//Middlewares
 	middlewares.FiberMiddleware(app)
 
 	//Router

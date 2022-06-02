@@ -24,6 +24,6 @@ func (r AuthRequest) ValidateLoginInput() error {
 	)
 }
 
-type AuthUseCase interface {
-	AuthenticateUser(ctx context.Context, auth AuthRequest) (AuthResponse, error)
+type AuthUserUseCase interface {
+	Execute(ctx context.Context, auth AuthRequest) (AuthResponse, error)
 }
