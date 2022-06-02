@@ -10,16 +10,21 @@ func NewUserController(userRoute fiber.Router, us user.UserUseCase) {
 	controller := &user.UserController{
 		UserUseCase: us,
 	}
-	userRoute.Get("", controller.GetUsersController)
-	userRoute.Post("", controller.CreateUserController)
-	userRoute.Post("/email", controller.GetUserByEmailController)
+	userRoute.Get("",
+		middlewares.EnsureAuthentication(),
+		controller.GetUsersController)
+	userRoute.Post("",
+		middlewares.EnsureAuthentication(),
+		controller.CreateUserController)
 	userRoute.Get("/:userID",
 		middlewares.EnsureAuthentication(),
 		controller.GetUserController)
 	userRoute.Put("/:userID",
+		middlewares.EnsureAuthentication(),
 		controller.CheckIfUserExistsMiddleware,
 		controller.UpdateUserController)
 	userRoute.Delete("/:userID",
+		middlewares.EnsureAuthentication(),
 		controller.CheckIfUserExistsMiddleware,
 		controller.DeleteUserController)
 }
