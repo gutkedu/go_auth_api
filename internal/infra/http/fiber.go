@@ -10,7 +10,7 @@ import (
 	"github.com/gutkedu/golang_api/internal/infra/http/routes"
 )
 
-func Run() {
+func Setup() *fiber.App {
 
 	//Database
 	pgdb, err := gorm.ConnectToPgDB()
@@ -32,5 +32,5 @@ func Run() {
 	//Router
 	routes.RegisterRoutes(app, pgdb)
 
-	log.Fatal(app.Listen(":3333"))
+	return app
 }

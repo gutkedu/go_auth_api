@@ -5,12 +5,14 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/gutkedu/golang_api/internal/modules/roles"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // Implementation of the repository in this service.
 type userUseCase struct {
 	userRepository UserRepository
+	roleRepository roles.RoleRepository
 }
 
 func hashPassword(password string) (string, error) {
@@ -19,9 +21,10 @@ func hashPassword(password string) (string, error) {
 }
 
 // Create a new 'service' or 'use-case' for 'User' entity.
-func NewUserUseCase(r UserRepository) UserUseCase {
+func NewUserUseCase(ur UserRepository, rr roles.RoleRepository) UserUseCase {
 	return &userUseCase{
-		userRepository: r,
+		userRepository: ur,
+		roleRepository: rr,
 	}
 }
 
@@ -43,6 +46,8 @@ func (s *userUseCase) CreateUser(ctx context.Context, user *User) error {
 		return err
 	}
 	user.Password = hash
+
+	//TODO: assign new user to a role
 
 	return s.userRepository.Create(ctx, user)
 }
