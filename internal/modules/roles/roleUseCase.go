@@ -15,31 +15,30 @@ func NewRoleUseCase(r RoleRepository) RoleUseCase {
 		roleRepository: r,
 	}
 }
-
-func (c *roleUseCase) GetRoles(ctx context.Context) (*[]Role, error) {
-	return nil, nil
-}
-
-func (c *roleUseCase) GetRole(
-	ctx context.Context,
-	roleID uuid.UUID) (*Role, error) {
-	return nil, nil
-}
-
-func (c *roleUseCase) CreateRole(
+func (s *roleUseCase) CreateRole(
 	ctx context.Context,
 	role *Role) error {
-	return nil
+	return s.roleRepository.Store(ctx, role)
 }
 
-func (c *roleUseCase) UpdateRole(
+func (s *roleUseCase) GetRoles(ctx context.Context) (*[]Role, error) {
+	return s.roleRepository.Index(ctx)
+}
+
+func (s *roleUseCase) GetRole(
+	ctx context.Context,
+	roleID uuid.UUID) (*Role, error) {
+	return s.roleRepository.Show(ctx, roleID)
+}
+
+func (s *roleUseCase) UpdateRole(
 	ctx context.Context,
 	roleID uuid.UUID, role *Role) error {
-	return nil
+	return s.roleRepository.Update(ctx, roleID, role)
 }
 
-func (c *roleUseCase) DeleteRole(
+func (s *roleUseCase) DeleteRole(
 	ctx context.Context,
 	roleID uuid.UUID) error {
-	return nil
+	return s.roleRepository.Destroy(ctx, roleID)
 }

@@ -49,7 +49,7 @@ func (r *DBRepository) Create(ctx context.Context, user *User) error {
 }
 
 func (r *DBRepository) Update(ctx context.Context, userID uuid.UUID, user *User) error {
-	if err := r.db.Model(&User{}).Where("id = ?", userID).Updates(user).Error; err != nil {
+	if err := r.db.Model(&User{}).Where("ID = ?", userID).Updates(user).Error; err != nil {
 		return err
 	}
 	return nil

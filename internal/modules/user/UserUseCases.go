@@ -38,9 +38,6 @@ func (s *userUseCase) GetUserByEmail(ctx context.Context, email string) (*User, 
 }
 
 func (s *userUseCase) CreateUser(ctx context.Context, user *User) error {
-	user.CreatedAt = time.Now()
-	user.UpdatedAt = time.Now()
-
 	hash, err := hashPassword(user.Password)
 	if err != nil {
 		return err

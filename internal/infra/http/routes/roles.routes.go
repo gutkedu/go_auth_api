@@ -6,11 +6,15 @@ import (
 )
 
 func NewRolesController(
-	rolesRoute fiber.Router,
+	rolesRoutes fiber.Router,
 	uc roles.RoleUseCase) {
 	controller := &roles.RoleController{
 		RoleUseCase: uc,
 	}
 
-	rolesRoute.Post("", controller.CreateRoleController)
+	rolesRoutes.Post("", controller.CreateRoleController)
+	rolesRoutes.Get("", controller.GetRolesController)
+	rolesRoutes.Get("/:roleID", controller.GetRoleController)
+	rolesRoutes.Put("/:roleID", controller.UpdateRoleController)
+	rolesRoutes.Delete("/:roleID", controller.DeleteRoleController)
 }

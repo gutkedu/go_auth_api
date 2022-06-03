@@ -34,10 +34,10 @@ func (r Role) CreateRoleValidation() error {
 
 type RoleRepository interface {
 	Store(ctx context.Context, role *Role) error
-	Update(ctx context.Context, roleID uuid.UUID) error
+	Update(ctx context.Context, roleID uuid.UUID, role *Role) error
 	Destroy(ctx context.Context, roleID uuid.UUID) error
 	Index(ctx context.Context) (*[]Role, error)
-	Show(ctx context.Context, roleID uuid.UUID) (role *Role, err error)
+	Show(ctx context.Context, roleID uuid.UUID) (*Role, error)
 }
 
 type RoleUseCase interface {

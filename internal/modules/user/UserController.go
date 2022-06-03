@@ -104,11 +104,19 @@ func (h *UserController) CreateUserController(c *fiber.Ctx) error {
 func (h *UserController) UpdateUserController(c *fiber.Ctx) error {
 	// Initialize variables.
 	user := &User{}
-	targetedUserID := c.Locals("userID").(uuid.UUID)
 
 	// Create cancellable context.
 	customContext, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	// Fetch parameter.
+	userID, err := uuid.Parse(c.Params("userID"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"status":  "fail",
+			"message": "Please specify a valid user ID!",
+		})
+	}
 
 	// Parse request body.
 	if err := c.BodyParser(user); err != nil {
@@ -119,7 +127,7 @@ func (h *UserController) UpdateUserController(c *fiber.Ctx) error {
 	}
 
 	// Update one user.
-	err := h.UserUseCase.UpdateUser(customContext, targetedUserID, user)
+	err = h.UserUseCase.UpdateUser(customContext, userID, user)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(&fiber.Map{
 			"status":  "fail",
