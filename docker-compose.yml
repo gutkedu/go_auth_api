@@ -23,16 +23,12 @@ services:
       target: prod
     ports:
       - 3333:3333
-    environment:
-      - API_USERID=1
-      - API_USERNAME=fiber
-      - API_PASSWORD=fiber
-      - JWT_SECRET=fiber
+    #environment:
     links:
       - database
     depends_on:
       - database
-    command: ./golang_api
+    command: ./api_build
 
 volumes:
   pgdata:
