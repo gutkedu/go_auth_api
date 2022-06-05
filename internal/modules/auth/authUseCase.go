@@ -7,18 +7,12 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/gutkedu/golang_api/internal/modules/user"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/gutkedu/golang_api/internal/utils"
 )
 
 // Implementation of the repository in this service.
 type authUserUseCase struct {
 	userRepository user.UserRepository
-}
-
-// CheckPasswordHash compare password with hash
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
 }
 
 // Create a new 'service' or 'use-case' for 'User' entity.
@@ -35,10 +29,10 @@ func (s *authUserUseCase) Execute(
 	//get user
 	user, err := s.userRepository.FindByEmail(ctx, auth.Email)
 	if err != nil {
-		return AuthResponse{}, fmt.Errorf("email or password is incorrect!")
+		return AuthResponse{}, fmt.Errorf("email or password is incorrect")
 	}
 	//check password hash
-	if !CheckPasswordHash(auth.Password, user.Password) {
+	if !utils.CheckPasswordHash(auth.Password, user.Password) {
 		return AuthResponse{}, fmt.Errorf("email or password is incorrect")
 	}
 	//generate new token

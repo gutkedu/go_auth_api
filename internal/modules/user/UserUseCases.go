@@ -6,18 +6,13 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gutkedu/golang_api/internal/modules/roles"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/gutkedu/golang_api/internal/utils"
 )
 
 // Implementation of the repository in this service.
 type userUseCase struct {
 	userRepository UserRepository
 	roleRepository roles.RoleRepository
-}
-
-func hashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
 }
 
 // Create a new 'service' or 'use-case' for 'User' entity.
@@ -41,7 +36,7 @@ func (s *userUseCase) GetUserByEmail(ctx context.Context, email string) (*User, 
 }
 
 func (s *userUseCase) CreateUser(ctx context.Context, user *User) error {
-	hash, err := hashPassword(user.Password)
+	hash, err := utils.HashPassword(user.Password)
 	if err != nil {
 		return err
 	}
