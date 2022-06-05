@@ -1,0 +1,3 @@
+package config
+
+// ADD Auth configuration variables...

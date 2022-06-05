@@ -13,4 +13,4 @@ test:
 
 .PHONY: dev
 dev:
-	go run cmd/golang_api/main.go
+	go run cmd/golang_api/server.go
