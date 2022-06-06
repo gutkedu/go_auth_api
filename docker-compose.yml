@@ -28,7 +28,7 @@ services:
       - database
     depends_on:
       - database
-    command: ./api_build
+    command: ./api_binary
 
 volumes:
   pgdata:

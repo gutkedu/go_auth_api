@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build our application.
-RUN CGO_ENABLED=0 GOOS=linux go build -o api_build ./cmd/golang_api/server.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o api_binary ./cmd/golang_api/server.go
 
 # Use 'scratch' image for super-mini build.
 FROM scratch AS prod
@@ -23,8 +23,8 @@ FROM scratch AS prod
 WORKDIR /production
 
 # Copy our compiled executable from the last stage.
-COPY --from=api /compiler/api_build .
+COPY --from=api /compiler/api_binary .
 
 # Run application and expose port 3333.
 EXPOSE 3333
-CMD ["./api_build"]
+CMD ["./api_binary"]
